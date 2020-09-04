@@ -8,7 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.shreeApp.reddit.dto.SubredditDto;
 import com.shreeApp.reddit.exceptions.SpringRedditException;
-//import com.shreeApp.reddit.mapper.SubredditMapper;
+import com.shreeApp.reddit.mapper.SubredditMapper;
+
 import com.shreeApp.reddit.model.Subreddit;
 import com.shreeApp.reddit.repository.SubredditRepository;
 
@@ -19,18 +20,18 @@ import lombok.AllArgsConstructor;
 public class SubredditService {
 
 	private final SubredditRepository subredditRepository;
-	//private final SubredditMapper subredditMapper;
+	private final SubredditMapper subredditMapper;
 
 	@Transactional
 	public SubredditDto save(SubredditDto subredditDto) {
-		Subreddit save = subredditRepository.save(mapSubredditDto(subredditDto));
+		Subreddit save = subredditRepository.save(subredditMapper.mapDtoToSubreddit(subredditDto) );
 		subredditDto.setId(save.getId());
 		return subredditDto;
 	}
 
 	@Transactional(readOnly = true)
 	public List<SubredditDto> getAll() {
-		return subredditRepository.findAll().stream().map(this::mapToDto)
+		return subredditRepository.findAll().stream().map(subredditMapper::mapSubredditToDto)
 				.collect(Collectors.toList());
 
 	}
@@ -38,17 +39,17 @@ public class SubredditService {
 	public SubredditDto getSubreddit(Long id) throws SpringRedditException {
 		Subreddit subreddit = subredditRepository.findById(id)
 				.orElseThrow(() -> new SpringRedditException("No subreddit found with Id: " + id));
-		return mapToDto(subreddit);
+		return subredditMapper.mapSubredditToDto(subreddit);
 	}
 
 	
-	  private SubredditDto mapToDto(Subreddit subreddit) { return
+	/*  private SubredditDto mapToDto(Subreddit subreddit) { return
 	  SubredditDto.builder().name(subreddit.getName())
 	  .description(subreddit.getDescription()).build(); }
 	  
 	  private Subreddit mapSubredditDto(SubredditDto subredditDto) { return
 	  Subreddit.builder().name(subredditDto.getName())
 	  .description(subredditDto.getDescription()).build(); }
-	 
+	 */
 
 }

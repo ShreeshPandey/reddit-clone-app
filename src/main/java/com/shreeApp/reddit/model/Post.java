@@ -30,8 +30,8 @@ public class Post {
 	
 	@Id
 	@GeneratedValue(strategy=IDENTITY)
-	@Column(name="postId")
-	private Long Id;
+	//@Column(name="postId")
+	private Long postId;
 	
 	@NotBlank(message = "Post Name cannot be empty or Null")
 	private String postName;
