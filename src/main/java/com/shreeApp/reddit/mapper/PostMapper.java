@@ -1,50 +1,37 @@
 package com.shreeApp.reddit.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.springframework.beans.factory.annotation.Autowired;
-
+import com.github.marlonlom.utilities.timeago.TimeAgo;
 import com.shreeApp.reddit.dto.PostRequest;
 import com.shreeApp.reddit.dto.PostResponse;
 import com.shreeApp.reddit.enumeration.VoteType;
 import com.shreeApp.reddit.model.Post;
 import com.shreeApp.reddit.model.Subreddit;
 import com.shreeApp.reddit.model.User;
+import com.shreeApp.reddit.model.Vote;
 import com.shreeApp.reddit.repository.CommentRepository;
 import com.shreeApp.reddit.repository.VoteRepository;
 import com.shreeApp.reddit.service.AuthService;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.Optional;
 
-import static com.shreeApp.reddit.enumeration.VoteType.DOWNVOTE;
-import static com.shreeApp.reddit.enumeration.VoteType.UPVOTE;
+import static com.shreeApp.reddit.enumeration.VoteType.*;
 
-@Mapper(componentModel="spring")
-public interface PostMapper {
-	
-	/*@Autowired
+@Mapper(componentModel = "spring")
+public abstract class PostMapper {
+
+    @Autowired
     private CommentRepository commentRepository;
     @Autowired
     private VoteRepository voteRepository;
     @Autowired
-    private AuthService authService;*/
+    private AuthService authService;
 
-	@Mapping(target = "createdDate", expression = "java(java.time.Instant.now())")
-	@Mapping(target = "description", source = "postRequest.description")
-	Post map(PostRequest postRequest, Subreddit subreddit, User user);
-	
-	@Mapping(target = "id", source = "postId")
-	@Mapping(target = "userName", source = "user.username")
-	@Mapping(target = "subredditName", source = "subreddit.name")	
-	PostResponse mapToDto(Post post);
-	
-	/*@Mapping(target = "postName", source = "postName")
-	@Mapping(target = "url", source = "url")
-	@Mapping(target = "description", source = "description")*/
-	
-	
-	
-   /* @Mapping(target = "createdDate", expression = "java(java.time.Instant.now())")
+
+    @Mapping(target = "createdDate", expression = "java(java.time.Instant.now())")
     @Mapping(target = "description", source = "postRequest.description")
     @Mapping(target = "subreddit", source = "subreddit")
     @Mapping(target = "voteCount", constant = "0")
@@ -60,8 +47,7 @@ public interface PostMapper {
     @Mapping(target = "downVote", expression = "java(isPostDownVoted(post))")
     public abstract PostResponse mapToDto(Post post);
 
-*/
-    /*Integer commentCount(Post post) {
+    Integer commentCount(Post post) {
         return commentRepository.findByPost(post).size();
     }
 
@@ -86,6 +72,5 @@ public interface PostMapper {
                     .isPresent();
         }
         return false;
-    }*/
-
+    }
 }
