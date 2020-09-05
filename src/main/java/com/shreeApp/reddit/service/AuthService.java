@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.validation.Valid;
+
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,8 +16,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.shreeApp.reddit.controller.RefreshTokenService;
 import com.shreeApp.reddit.dto.AuthenticationResponse;
 import com.shreeApp.reddit.dto.LoginRequest;
+import com.shreeApp.reddit.dto.RefreshTokenRequest;
 import com.shreeApp.reddit.dto.RegisterRequest;
 import com.shreeApp.reddit.exceptions.SpringRedditException;
 import com.shreeApp.reddit.model.NotificationEmail;
@@ -38,7 +42,8 @@ public class AuthService {
 	private final VerificationTokenRepository verificationTokenRepository;
 	private final MailService mailService;
 	private final AuthenticationManager authenticationManager;
-	private final JwtProvider jwtProvder;
+	private final JwtProvider jwtProvider;
+	private final RefreshTokenService refreshTokenService;
 
 	public void signup(RegisterRequest registerRequest) throws SpringRedditException {
 
@@ -93,10 +98,26 @@ public class AuthService {
 	public AuthenticationResponse login(LoginRequest loginRequest) throws InvalidKeyException, SpringRedditException {
 	Authentication authentication =	authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),loginRequest.getPassword()));
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		String token = jwtProvder.generateToken(authentication);
-		return new AuthenticationResponse(token,loginRequest.getUsername());
+		String token = jwtProvider.generateToken(authentication);
+		return AuthenticationResponse.builder()
+                .authenticationToken(token)
+                .refreshToken(refreshTokenService.generateRefreshToken().getToken())
+                .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
+                .username(loginRequest.getUsername())
+                .build();
 	}
 
+	public AuthenticationResponse refreshToken(@Valid RefreshTokenRequest refreshTokenRequest) throws SpringRedditException {
+		refreshTokenService.validateRefreshToken(refreshTokenRequest.getRefreshToken());
+		String token = jwtProvider.generateTokenWithUserName(refreshTokenRequest.getUsername());
+		return AuthenticationResponse.builder()
+									 .authenticationToken(token)
+									 .refreshToken(refreshTokenRequest.getRefreshToken())
+						             .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
+						             .username(refreshTokenRequest.getUsername())
+						             .build(); 
+	}
+	
 	public boolean isLoggedIn() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
