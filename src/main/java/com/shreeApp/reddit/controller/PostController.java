@@ -43,12 +43,12 @@ public class PostController {
         return status(HttpStatus.OK).body(postService.getPost(id));
     }
 
-    @GetMapping("by-subreddit/{id}")
+    @GetMapping("/by-subreddit/{id}")
     public ResponseEntity<List<PostResponse>> getPostsBySubreddit(Long id) throws SubredditNotFoundException {
         return status(HttpStatus.OK).body(postService.getPostsBySubreddit(id));
     }
 
-    @GetMapping("by-user/{name}")
+    @GetMapping("/by-user/{name}")
     public ResponseEntity<List<PostResponse>> getPostsByUsername(String username) {
         return status(HttpStatus.OK).body(postService.getPostsByUsername(username));
     }

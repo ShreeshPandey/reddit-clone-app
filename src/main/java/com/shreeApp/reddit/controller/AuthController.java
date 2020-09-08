@@ -38,7 +38,7 @@ public class AuthController {
 		return new ResponseEntity<>("User Registration Successful", OK);
 	}
 	
-	@GetMapping("accountVerification/{token}")
+	@GetMapping("/accountVerification/{token}")
 	public ResponseEntity<String> verifyAccount(@PathVariable String token) throws SpringRedditException{
 		authService.verifyAccount(token);
 		return new ResponseEntity<>("Account Succesfully Activated!",OK);

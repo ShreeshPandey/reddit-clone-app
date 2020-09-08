@@ -18,7 +18,7 @@ import com.shreeApp.reddit.service.CommentService;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/api/comments/")
+@RequestMapping("/api/comments")
 @AllArgsConstructor
 public class CommentController {
 	
